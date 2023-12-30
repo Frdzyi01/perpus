@@ -35,29 +35,31 @@ if (isset($_POST['tambah'])) {
 }
 
 if (isset($_POST['edit'])) {
-	if (isset(
-		$_POST['id'],
-		$_POST['nama_siswa'],
-		$_POST['jenis_kelamin'],
-		$_POST['kelas'],
-		$_POST['kode_peminjaman'],
-		$_POST['judul_buku'],
-		$_POST['penerbit'],
-		$_POST['pengarang'],
-		$_POST['tahun_terbit'],
-		$_POST['tujuan_pinjam'],
-		$_POST['tanggal_peminjaman'],
-		$_POST['tanggal_pengembalian'],
-		$_POST['jumlah_buku_dipinjam'],
-		$_POST['status']
-	)) {
+	if (
+		isset(
+			$_POST['id'],
+			$_POST['nama_siswa'],
+			$_POST['jenis_kelamin'],
+			$_POST['kelas'],
+			$_POST['kode_peminjaman'],
+			$_POST['judul_buku'],
+			$_POST['penerbit'],
+			$_POST['pengarang'],
+			$_POST['tahun_terbit'],
+			$_POST['tujuan_pinjam'],
+			$_POST['tanggal_peminjaman'],
+			$_POST['tanggal_pengembalian'],
+			$_POST['jumlah_buku_dipinjam'],
+			$_POST['status']
+		)
+	) {
 		// Cek apakah ID tersedia dan tidak kosong
 		if (empty($_POST['id'])) {
 			echo "ID tidak boleh kosong!";
 			exit;
 		}
 
-		$id = $_POST['id'];
+		$id = intval($_POST['id']);
 		$nama_siswa = $_POST['nama_siswa'];
 		$jenis_kelamin = $_POST['jenis_kelamin'];
 		$kelas = $_POST['kelas'];
@@ -69,14 +71,15 @@ if (isset($_POST['edit'])) {
 		$status = $_POST['status'];
 
 		// Mencari buku berdasarkan ID
-		$id = mysqli_real_escape_string($koneksi, $_POST['id']);
-		$select_buku = "SELECT * FROM buku WHERE id='$id'";
-		$result_buku = mysqli_query($koneksi, $select_buku);
+		$query = mysqli_prepare($koneksi, "SELECT * FROM buku WHERE id = ?");
+		mysqli_stmt_bind_param($query, "i", $id);
+		mysqli_stmt_execute($query);
 
+		$result_buku = mysqli_stmt_get_result($query);
 		$row_buku = mysqli_fetch_assoc($result_buku);
 
-		if ($result_buku && $row_buku) {
-			// Mengambil detail buku
+		if ($result_buku && mysqli_num_rows($result_buku) > 0) {
+			// Mengambil detail buku dari $row_buku
 			$judul_buku = $row_buku['judul_buku'];
 			$penerbit = $row_buku['penerbit'];
 			$pengarang = $row_buku['pengarang'];
@@ -84,7 +87,7 @@ if (isset($_POST['edit'])) {
 
 			// Proses update data peminjaman
 			// Menyiapkan query UPDATE dengan parameter tanda tanya (?)
-			$query = mysqli_prepare($koneksi, "UPDATE tabel_pinjam SET
+			$update_query = mysqli_prepare($koneksi, "UPDATE tabel_pinjam SET
                     nama_siswa = ?,
                     jenis_kelamin = ?,
                     kelas = ?,
@@ -102,7 +105,7 @@ if (isset($_POST['edit'])) {
 
 			// Binding parameter ke dalam statement
 			mysqli_stmt_bind_param(
-				$query,
+				$update_query,
 				"ssssssssssssss",
 				$nama_siswa,
 				$jenis_kelamin,
@@ -120,18 +123,15 @@ if (isset($_POST['edit'])) {
 				$id
 			);
 
-			// Mengeksekusi statement
-			if (mysqli_stmt_execute($query)) {
-				// Menutup statement
-				mysqli_stmt_close($query);
-
-				// Redirect jika berhasil
+			if (mysqli_stmt_execute($update_query)) {
+				mysqli_stmt_close($update_query);
 				header("Location: data_peminjaman.php");
 				exit;
 			} else {
-				// Menampilkan pesan kesalahan jika eksekusi gagal
 				echo "Update failed: " . mysqli_error($koneksi);
 			}
+		} else {
+			echo "Buku tidak ditemukan";
 		}
 	}
 }

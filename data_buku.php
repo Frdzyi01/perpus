@@ -23,13 +23,15 @@ $result = $koneksi->query($query);
     <nav class="navbar navbar-inverse">
         <div class="container-fluid">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
                     <span class="sr-only">Toggle navigation</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="administrator.php"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Home</a>
+                <a class="navbar-brand" href="administrator.php"><span class="glyphicon glyphicon-home"
+                        aria-hidden="true"></span> Home</a>
             </div>
 
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -40,14 +42,18 @@ $result = $koneksi->query($query);
                             Data Buku</a></li>
                     <li><a href="Siswa.php"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
                             Siswa</a></li>
-                    <li><a href="Data_Siswa.php"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> Data Siswa</a></li>
+                    <li><a href="Data_Siswa.php"><span class="glyphicon glyphicon-folder-open"
+                                aria-hidden="true"></span> Data Siswa</a></li>
                     <li><a href="Pinjam_Buku.php"><span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
                             Pinjam Buku</a></li>
-                    <li><a href="Data_Peminjaman.php"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> Data Peminjaman Buku</a></li>
-                    <li><a href="Pengembalian_Buku.php"><span class="glyphicon glyphicon-upload" aria-hidden="true"></span> Pengembalian Buku</a></li>
+                    <li><a href="Data_Peminjaman.php"><span class="glyphicon glyphicon-folder-open"
+                                aria-hidden="true"></span> Data Peminjaman Buku</a></li>
+                    <li><a href="Pengembalian_Buku.php"><span class="glyphicon glyphicon-upload"
+                                aria-hidden="true"></span> Pengembalian Buku</a></li>
                     <li><a href="Denda.php"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
                             Denda</a></li>
-                    <li><a href="Ketentuan.php"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Ketentuan</a></li>
+                    <li><a href="Ketentuan.php"><span class="glyphicon glyphicon-exclamation-sign"
+                                aria-hidden="true"></span> Ketentuan</a></li>
                     <li><a href="Tentang.php"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
                             Tentang</a></li>
                     <li><a href="logout.php"><span class="glyphicon glyphicon-off" aria-hidden="true"></span> Logout</a>
@@ -64,15 +70,14 @@ $result = $koneksi->query($query);
                     <h1>Data Buku!</h1>
                 </div>
 
-                <button type="button" name="bulk_delete" id="delete_all" class="btn btn-danger">Hapus Terpilih</button>
-
+                <!-- Tombol Hapus Semua Data -->
+                <div style="margin-bottom: 10px;" align="left">
+                    <button class="btn btn-danger btn-lg" onclick="confirmDeletion()">Hapus Semua Data</button>
+                </div>
 
                 <table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%">
                     <thead>
                         <tr>
-                            <!-- temppat checked data yg mau di hapus -->
-                            <th><input type="checkbox" id="checkAll"></th>
-
                             <th>No</th>
                             <th>Nomor Buku</th>
                             <th>Judul</th>
@@ -93,8 +98,6 @@ $result = $koneksi->query($query);
                             $i = 1;
                             while ($row = $result->fetch_assoc()) {
                                 echo "<tr>";
-                                echo "<td><input type='checkbox' class='delete_checkbox' value='" . $row['id'] . "'></td>";
-
                                 echo "<td>" . $i . "</td>";
                                 echo "<td>" . $row['id_buku'] . "</td>";
                                 echo "<td>" . $row['judul_buku'] . "</td>";
@@ -124,9 +127,9 @@ $result = $koneksi->query($query);
     </div>
 
     <script>
-        $(document).ready(function() {
-            $('#example').dataTable();
-        });
+    $(document).ready(function() {
+        $('#example').dataTable();
+    });
     </script>
 
     <div align="center">
@@ -137,50 +140,14 @@ $result = $koneksi->query($query);
     <script type="text/javascript" src="js/jquery.js"></script>
     <script type="text/javascript" src="js/bootstrap.js"></script>
 
+    <!-- Skrip Konfirmasi Penghapusan -->
     <script>
-        $(document).ready(function() {
-            // Inisialisasi DataTable
-            $('#example').dataTable();
-
-            // Checkbox untuk memilih semua
-            $('#checkAll').click(function() {
-                if (this.checked) {
-                    $('.delete_checkbox').each(function() {
-                        this.checked = true;
-                    });
-                } else {
-                    $('.delete_checkbox').each(function() {
-                        this.checked = false;
-                    });
-                }
-            });
-
-            // Fungsi untuk tombol hapus massal
-            $('#delete_all').click(function() {
-                var dataArr = new Array();
-                $(".delete_checkbox:checked").each(function() {
-                    dataArr.push($(this).val());
-                });
-
-                if (dataArr.length > 0) {
-                    var checkstr = confirm("Apakah Anda yakin ingin menghapus data ini?");
-                    if (checkstr == true) {
-                        var join_selected_values = dataArr.join(",");
-
-                        $.ajax({
-                            type: "POST",
-                            url: "hapus_semua_data_buku.php",
-                            cache: false,
-                            data: 'id=' + join_selected_values,
-                            success: function(response) {
-                                // Reload DataTable atau halaman
-                                location.reload();
-                            }
-                        });
-                    }
-                }
-            });
-        });
+    function confirmDeletion() {
+        var confirmAction = confirm("Apakah Anda yakin ingin menghapus semua data buku?");
+        if (confirmAction) {
+            window.location.href = 'hapus_semua_data_buku.php';
+        }
+    }
     </script>
 
 

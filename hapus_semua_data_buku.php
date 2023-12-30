@@ -1,23 +1,13 @@
 <?php
-include "koneksi.php"; // Memastikan koneksi database terbentuk
+include "koneksi.php"; // Pastikan ini adalah jalur yang benar ke file koneksi.php Anda
 
-// Mengecek apakah ada data yang dikirim melalui POST
-if (isset($_POST['id'])) {
-    $idBukuArray = $_POST['id'];
+// Query untuk menghapus semua data dari tabel buku
+$query = "DELETE FROM buku";
 
-    // Mengubah array menjadi string untuk query SQL
-    $idBukuString = implode(',', array_map('intval', $idBukuArray));
-
-    // Query untuk menghapus buku berdasarkan ID yang dipilih
-    $query = "DELETE FROM buku WHERE id IN ($idBukuString)";
-
-    if ($koneksi->query($query) === TRUE) {
-        echo "<script>alert('Data buku yang dipilih telah berhasil dihapus.'); window.location.href='Data_Buku.php';</script>";
-    } else {
-        echo "<script>alert('Terjadi kesalahan saat menghapus data: " . $koneksi->error . "'); window.location.href='Data_Buku.php';</script>";
-    }
+if ($koneksi->query($query) === TRUE) {
+    echo "<script>alert('Semua data buku telah berhasil dihapus.'); window.location.href='data_buku.php';</script>";
 } else {
-    echo "<script>alert('Tidak ada data yang dipilih untuk dihapus.'); window.location.href='Data_Buku.php';</script>";
+    echo "<script>alert('Terjadi kesalahan saat menghapus data: " . $koneksi->error . "'); window.location.href='data_buku.php';</script>";
 }
 
 $koneksi->close();
