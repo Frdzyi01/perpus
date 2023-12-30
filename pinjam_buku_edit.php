@@ -202,7 +202,8 @@
                     <td>:</td>
                     <td>
                         <!-- Tambahkan event onchange ke dropdown buku untuk memanggil fungsi updateBookInfo() -->
-                        <select name="judul_buku" id="judul_buku" class="form-control" onchange="updateBookInfo()">
+                        <select name="judul_buku" id="judul_buku" class="form-control" onchange="updateBookInfo()"
+                            disabled>
                             <option value="">Pilih Buku</option>
                             <?php
                             include "koneksi.php";
